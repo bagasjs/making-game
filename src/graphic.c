@@ -128,6 +128,22 @@ int shader_get_uniform_location(Renderer *render, ShaderID id, const char *name)
     return -1;
 }
 
+BOOL shader_set_uniform_vec3(Renderer *ren, ShaderID shader, const char *name, Vec3 vec)
+{
+    int loc = shader_get_uniform_location(ren, shader, name);
+    if(loc < 0) return FALSE;
+    glUniform3fv(loc, 1, (GLfloat*)&vec);
+    return TRUE;
+}
+
+BOOL shader_set_uniform_mat4(Renderer *ren, ShaderID shader, const char *name, Mat4 mat)
+{
+    int loc = shader_get_uniform_location(ren, shader, name);
+    if(loc < 0) return FALSE;
+    glUniformMatrix4fv(loc, 1, GL_FALSE, mat.data);
+    return TRUE;
+}
+
 TextureID render_create_texture_from_file(Renderer *render, const char *filepath)
 {
     stbi_set_flip_vertically_on_load(true);
@@ -170,34 +186,41 @@ TextureID render_create_texture(Renderer *ren, TextureDesc desc)
     return id;
 }
 
-int texture_get_opengl_id(Renderer *render, TextureID id, uint32_t *opengl_id)
+BOOL texture_get_opengl_id(Renderer *render, TextureID id, uint32_t *opengl_id)
 {
     if(!opengl_id) {
         DEBUG_ERROR("Invalid argument opengl_id: %p\n", opengl_id);
-        return 0;
+        return FALSE;
     }
     Texture texture = render->textures.items[id];
     if(!texture.init) {
         DEBUG_ERROR("Invalid texture id: %u\n", id);
-        return 0;
+        return FALSE;
     }
     *opengl_id = texture.texture;
-    return 1;
+    return TRUE;
 }
 
 Camera create_perspective_camera(Vec3 pos, uint32_t window_width, uint32_t window_height, float near, float far, float fov_radians)
 {
     Camera cam = {0};
-    cam.projection = mat4_perspective(fov_radians, (float)window_width/window_height, near, far);
+    cam.fov_radians = fov_radians;
+    cam.near = near;
+    cam.far  = far;
     cam.pos = pos;
     cam.up = vec3(0.0f, 1.0f, 0.0f);
+    camera_update_window_size(&cam, window_width, window_height);
     camera_update_direction(&cam, vec3(0.0f, 0.0f, 0.0f));
     return cam;
 }
 
+void camera_update_window_size(Camera *camera, uint32_t window_width, uint32_t window_height)
+{
+    camera->projection = mat4_perspective(camera->fov_radians, (float)window_width/window_height, camera->near, camera->far);
+}
+
 void camera_update_direction(Camera *camera, Vec3 target)
 {
-    printf("TARGET x=%f,y=%f,z=%f\n", target.x, target.y, target.z);
     camera->direction = target;
     camera->front = vec3_normalize(camera->direction);
 }
