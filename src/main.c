@@ -10,8 +10,7 @@
 
 typedef struct Vertex {
     Vec3 pos;
-    Vec4 color;
-    Vec2 tex_coords;
+    Vec3 normal;
 } Vertex;
 
 #define WINDOW_WIDTH  800
@@ -24,7 +23,7 @@ float yaw = -90.0f, pitch = 0.0f;
 float delta_time = 0.0f;
 float last_frame = 0.0f;
 bool cursor_disabled_mode = true;
-Camera camera = {0};;
+Camera camera = {0};
 
 void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
 {
@@ -127,30 +126,35 @@ int main(void)
     frag.count = 0;
 
     Vertex vertices[] = {
-        { .pos = { -0.5f, -0.5f, -0.5f }, }, // .color = { 0.0f, 1.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 0.0f, } }, 
-        { .pos = { +0.5f, -0.5f, -0.5f }, }, // .color = { 0.0f, 0.0f, 1.0f, 1.0f }, .tex_coords = { 1.0f, 0.0f, } }, 
-        { .pos = { +0.5f, +0.5f, -0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 1.0f, 1.0f, } }, 
-        { .pos = { -0.5f, +0.5f, -0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 1.0f, } }, 
-        { .pos = { -0.5f, -0.5f, +0.5f }, }, // .color = { 0.0f, 1.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 0.0f, } }, 
-        { .pos = { +0.5f, -0.5f, +0.5f }, }, // .color = { 0.0f, 0.0f, 1.0f, 1.0f }, .tex_coords = { 1.0f, 0.0f, } }, 
-        { .pos = { +0.5f, +0.5f, +0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 1.0f, 1.0f, } }, 
-        { .pos = { -0.5f, +0.5f, +0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 1.0f, } }, 
-        { .pos = { -0.5f, +0.5f, +0.5f }, }, // .color = { 0.0f, 1.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 0.0f, } }, 
-        { .pos = { -0.5f, +0.5f, -0.5f }, }, // .color = { 0.0f, 0.0f, 1.0f, 1.0f }, .tex_coords = { 1.0f, 0.0f, } }, 
-        { .pos = { -0.5f, -0.5f, -0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 1.0f, 1.0f, } }, 
-        { .pos = { -0.5f, -0.5f, +0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 1.0f, } }, 
-        { .pos = { +0.5f, +0.5f, +0.5f }, }, // .color = { 0.0f, 1.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 0.0f, } }, 
-        { .pos = { +0.5f, +0.5f, -0.5f }, }, // .color = { 0.0f, 0.0f, 1.0f, 1.0f }, .tex_coords = { 1.0f, 0.0f, } }, 
-        { .pos = { +0.5f, -0.5f, -0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 1.0f, 1.0f, } }, 
-        { .pos = { +0.5f, -0.5f, +0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 1.0f, } }, 
-        { .pos = { -0.5f, -0.5f, -0.5f }, }, // .color = { 0.0f, 1.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 0.0f, } }, 
-        { .pos = { +0.5f, -0.5f, -0.5f }, }, // .color = { 0.0f, 0.0f, 1.0f, 1.0f }, .tex_coords = { 1.0f, 0.0f, } }, 
-        { .pos = { +0.5f, -0.5f, +0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 1.0f, 1.0f, } }, 
-        { .pos = { -0.5f, -0.5f, +0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 1.0f, } }, 
-        { .pos = { -0.5f, +0.5f, -0.5f }, }, // .color = { 0.0f, 1.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 0.0f, } }, 
-        { .pos = { +0.5f, +0.5f, -0.5f }, }, // .color = { 0.0f, 0.0f, 1.0f, 1.0f }, .tex_coords = { 1.0f, 0.0f, } }, 
-        { .pos = { +0.5f, +0.5f, +0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 1.0f, 1.0f, } }, 
-        { .pos = { -0.5f, +0.5f, +0.5f }, }, // .color = { 1.0f, 0.0f, 0.0f, 1.0f }, .tex_coords = { 0.0f, 1.0f, } }, 
+        { .pos = { -0.5f, -0.5f, -0.5f }, .normal = { 0.0f, 0.0f, -1.0f, }, }, 
+        { .pos = { +0.5f, -0.5f, -0.5f }, .normal = { 0.0f, 0.0f, -1.0f, }, }, 
+        { .pos = { +0.5f, +0.5f, -0.5f }, .normal = { 0.0f, 0.0f, -1.0f, }, }, 
+        { .pos = { -0.5f, +0.5f, -0.5f }, .normal = { 0.0f, 0.0f, -1.0f, }, }, 
+
+        { .pos = { -0.5f, -0.5f, +0.5f }, .normal = { 0.0f, 0.0f,  1.0f, }, }, 
+        { .pos = { +0.5f, -0.5f, +0.5f }, .normal = { 0.0f, 0.0f,  1.0f, }, }, 
+        { .pos = { +0.5f, +0.5f, +0.5f }, .normal = { 0.0f, 0.0f,  1.0f, }, }, 
+        { .pos = { -0.5f, +0.5f, +0.5f }, .normal = { 0.0f, 0.0f,  1.0f, }, }, 
+
+        { .pos = { -0.5f, +0.5f, +0.5f }, .normal = { -1.0f, 0.0f, 0.0f, }, }, 
+        { .pos = { -0.5f, +0.5f, -0.5f }, .normal = { -1.0f, 0.0f, 0.0f, }, }, 
+        { .pos = { -0.5f, -0.5f, -0.5f }, .normal = { -1.0f, 0.0f, 0.0f, }, }, 
+        { .pos = { -0.5f, -0.5f, +0.5f }, .normal = { -1.0f, 0.0f, 0.0f, }, }, 
+
+        { .pos = { +0.5f, +0.5f, +0.5f }, .normal = {  1.0f, 0.0f, 0.0f, }, }, 
+        { .pos = { +0.5f, +0.5f, -0.5f }, .normal = {  1.0f, 0.0f, 0.0f, }, }, 
+        { .pos = { +0.5f, -0.5f, -0.5f }, .normal = {  1.0f, 0.0f, 0.0f, }, }, 
+        { .pos = { +0.5f, -0.5f, +0.5f }, .normal = {  1.0f, 0.0f, 0.0f, }, }, 
+
+        { .pos = { -0.5f, -0.5f, -0.5f }, .normal = { 0.0f, -1.0f, 0.0f, }, }, 
+        { .pos = { +0.5f, -0.5f, -0.5f }, .normal = { 0.0f, -1.0f, 0.0f, }, }, 
+        { .pos = { +0.5f, -0.5f, +0.5f }, .normal = { 0.0f, -1.0f, 0.0f, }, }, 
+        { .pos = { -0.5f, -0.5f, +0.5f }, .normal = { 0.0f, -1.0f, 0.0f, }, }, 
+
+        { .pos = { -0.5f, +0.5f, -0.5f }, .normal = { 0.0f,  1.0f, 0.0f, }, }, 
+        { .pos = { +0.5f, +0.5f, -0.5f }, .normal = { 0.0f,  1.0f, 0.0f, }, }, 
+        { .pos = { +0.5f, +0.5f, +0.5f }, .normal = { 0.0f,  1.0f, 0.0f, }, }, 
+        { .pos = { -0.5f, +0.5f, +0.5f }, .normal = { 0.0f,  1.0f, 0.0f, }, }, 
     };
 
     // Indices are part of vao
@@ -180,6 +184,8 @@ int main(void)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
     GLuint light_cube_vao = 0;
     glGenVertexArrays(1, &light_cube_vao);
@@ -207,6 +213,8 @@ int main(void)
         shader_use(ren, lighting_shader);
         shader_set_uniform_vec3(ren, lighting_shader, "objectColor", vec3(1.0f, 0.5f, 0.31f));
         shader_set_uniform_vec3(ren, lighting_shader, "lightColor",  vec3(1.0f, 1.0f, 1.0));
+        shader_set_uniform_vec3(ren, lighting_shader, "lightPos",  light_pos);
+        shader_set_uniform_vec3(ren, lighting_shader, "viewPos",  camera.pos);
         model = mat4_eye(1.0f);
         model = mat4_translate(model, vec3(0.0f, 0.0f, 0.0f));
         shader_set_uniform_mat4(ren, lighting_shader, "view", view);
